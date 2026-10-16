@@ -20,14 +20,14 @@ El entorno está distribuido en nodos con roles diferenciados para garantizar la
 
 ```text
 .
+├── Documentación/                           # Documentación de apoyo
+│   ├── Configuración Raspberry PI.txt            # Guía de instalación en Raspberry PI
+│   └── Comandos de Validación y Remediación.txt  # Validación y recuperación ante fallos
 ├── Manifiestos/                             # Manifiestos YAML de Kubernetes
 │   ├── 01-mqtt-deployment.yaml                   # Broker MQTT
 │   ├── 02-mqtt-to-influx.yaml                    # Base de datos de series temporales
 │   ├── 03-metrics-stack.yaml                     # Tableros de monitoreo y visualización
 │   └── 04-edge-sensor-model.yaml                 # Clasificador / Procesador de sensores
-├── Documentación/                           # Documentación de apoyo
-│   ├── Configuración Raspberry PI.txt            # Guía de instalación en Raspberry PI
-│   └── Comandos de Validación y Remediación.txt  # Validación y recuperación ante fallos
 └── README.md                                # Documentación principal del proyecto
 ```
 
