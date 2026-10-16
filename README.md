@@ -20,16 +20,15 @@ El entorno está distribuido en nodos con roles diferenciados para garantizar la
 
 ```text
 .
-├── README.md                           # Documentación principal del proyecto
-├── manifests/                          # Manifiestos YAML de Kubernetes
-│   ├── 00-namespace.yaml               # Creación del namespace 'predictivo'
-│   ├── 01-mosquitto-deployment.yaml   # Broker MQTT
-│   ├── 02-influxdb-deployment.yaml    # Base de datos de series temporales
-│   ├── 03-grafana-deployment.yaml     # Tableros de monitoreo y visualización
-│   └── 04-classifier-deployment.yaml  # Clasificador / Procesador de sensores
-└── docs/
-    ├── comandos-despliegue.txt        # Guía de instalación y comandos rápidos
-    └── solucion-de-problemas.txt      # Troubleshooting y recuperación ante fallos
+├── README.md                                # Documentación principal del proyecto
+├── Manifiestos/                             # Manifiestos YAML de Kubernetes
+│   ├── 01-mqtt-deployment.yaml                   # Broker MQTT
+│   ├── 02-mqtt-to-influx.yaml                    # Base de datos de series temporales
+│   ├── 03-metrics-stack.yaml                     # Tableros de monitoreo y visualización
+│   └── 04-edge-sensor-model.yaml                 # Clasificador / Procesador de sensores
+└── Documentación/                           # Documentación de apoyo
+    ├── Configuración Raspberry PI.txt            # Guía de instalación en Raspberry PI
+    └── Comandos de Validación y Remediación.txt  # Validación y recuperación ante fallos
 ```
 
 ---
