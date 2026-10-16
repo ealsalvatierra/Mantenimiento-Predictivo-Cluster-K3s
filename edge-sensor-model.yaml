@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-sensor-classifier
+  namespace: predictivo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edge-classifier
+  template:
+    metadata:
+      labels:
+        app: edge-classifier
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker2-pi
+      containers:
+      - name: sensor-simulator
+        image: python:3.10-slim
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          pip install paho-mqtt numpy scikit-learn
+          cat << 'EOF' > app.py
+          import time, random, json
+          import paho.mqtt.client as mqtt
+          from sklearn.ensemble import IsolationForest
+          import numpy as np
+
+          # Entrenamiento rápido de modelo local de detección de anomalías
+          X_train = np.random.normal(loc=[45.0, 1.2], scale=[2.0, 0.1], size=(100, 2))
+          model = IsolationForest(contamination=0.1, random_state=42)
+          model.fit(X_train)
+
+          client = mqtt.Client()
+          client.connect("mosquitto-service.predictivo.svc.cluster.local", 1883, 60)
+
+          while True:
+              # Simulación de lectura de sensores
+              temp = random.normalvariate(45.0, 2.0)
+              vib = random.normalvariate(1.2, 0.1)
+
+              # 5% de probabilidad de inyectar fallo mecánico en caliente
+              if random.random() < 0.05:
+                  temp += random.uniform(20.0, 35.0)
+                  vib += random.uniform(2.5, 4.0)
+
+              # Clasificación en tiempo real (Edge AI)
+              pred = model.predict([[temp, vib]])[0] # 1: Normal, -1: Fallo/Anomalía
+              estado = "NORMAL" if pred == 1 else "FALLO_MECANICO"
+
+              payload = {
+                  "temperatura": round(temp, 2),
+                  "vibracion": round(vib, 2),
+                  "estado_clasificado": estado
+              }
+              client.publish("industrial/sensores/pi", json.dumps(payload))
+              print(f"[EDGE RPi] Publicado: {payload}", flush=True)
+              time.sleep(2)
+          EOF
+          python app.py

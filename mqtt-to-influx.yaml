@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-persister
+  namespace: predictivo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-persister
+  template:
+    metadata:
+      labels:
+        app: mqtt-persister
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker1-node
+      containers:
+      - name: persister
+        image: python:3.10-slim
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          pip install paho-mqtt influxdb
+          cat << 'PYEOF' > persister.py
+          import json
+          import paho.mqtt.client as mqtt
+          from influxdb import InfluxDBClient
+
+          db = InfluxDBClient(host='influxdb-service.predictivo.svc.cluster.local', port=8086, database='mantenimiento')
+
+          def on_message(client, userdata, msg):
+              payload = json.loads(msg.payload.decode())
+              temp = payload['temperatura']
+              vib = payload['vibracion']
+              estado = payload['estado_clasificado']
+              anomalia_num = 1 if estado == "FALLO_MECANICO" else 0
+
+              json_body = [
+                  {
+                      "measurement": "sensores_edge",
+                      "tags": {"nodo": "worker2-pi", "estado": estado},
+                      "fields": {
+                          "temperatura": float(temp),
+                          "vibracion": float(vib),
+                          "anomalia": int(anomalia_num)
+                      }
+                  }
+              ]
+              db.write_points(json_body)
+              print(f"[PERSISTER] Guardado en InfluxDB: {payload}", flush=True)
+
+          client = mqtt.Client()
+          client.on_message = on_message
+          client.connect("mosquitto-service.predictivo.svc.cluster.local", 1883, 60)
+          client.subscribe("industrial/sensores/pi")
+          client.loop_forever()
+          PYEOF
+          python persister.py

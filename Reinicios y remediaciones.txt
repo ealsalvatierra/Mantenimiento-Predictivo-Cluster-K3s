@@ -1,0 +1,21 @@
+sudo systemctl stop k3s
+sudo pkill -9 -f k3s
+free -m
+sudo systemctl start k3s
+sleep 15
+sudo kubectl get nodes -o wide
+
+sudo kubectl rollout restart deployment mqtt-persister edge-sensor-classifier -n predictivo
+
+
+sudo systemctl stop k3s
+sudo pkill -9 -f runc
+sudo pkill -9 -f containerd
+sudo systemctl start k3s
+sleep 30
+sudo kubectl get nodes -o wide
+
+free -m
+sudo systemctl start k3s
+sleep 15
+sudo kubectl get nodes -o wide
