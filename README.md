@@ -1,5 +1,4 @@
-Clúster K3s para Monitoreo y Análisis Predictivo (IoT / Edge)
-Este repositorio contiene los manifiestos de Kubernetes (`.yaml`) y las guías de comandos para desplegar y administrar un clúster de K3s enfocado en el procesamiento de métricas en tiempo real, ingestión MQTT, almacenamiento de series temporales y visualización de datos.
+Clúster Hibrido K3s: Mantenimiento Predictivo Industrial
 ---
 📐 Arquitectura del Clúster
 El entorno está distribuido en nodos con roles diferenciados para garantizar la estabilidad del plano de control y un rendimiento óptimo en el procesamiento de cargas:
